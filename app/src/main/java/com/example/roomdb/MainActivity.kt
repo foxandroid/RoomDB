@@ -13,14 +13,17 @@ import kotlinx.coroutines.withContext
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var appDb : AppDatabase
     lateinit var binding : ActivityMainBinding
+    private lateinit var appDb : AppDatabase // reference variable for our database
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        appDb = AppDatabase.getDatabase(this)
+
+
+        appDb = AppDatabase.getDatabase(this)  // initialise our reference variable
+
         binding.btnWriteData.setOnClickListener {
             writeData()
         }
@@ -38,6 +41,10 @@ class MainActivity : AppCompatActivity() {
             }
 
         }
+
+        binding.btnUpdate.setOnClickListener {
+            updateData()
+        }
     }
 
     private fun writeData(){
@@ -46,12 +53,11 @@ class MainActivity : AppCompatActivity() {
         val lastName = binding.etLastName.text.toString()
         val rollNo = binding.etRollNo.text.toString()
 
-        if(firstName.isNotEmpty() && lastName.isNotEmpty() && rollNo.isNotEmpty()     ) {
-            val student = Student(
-                null, firstName, lastName, rollNo.toInt()
-            )
-            GlobalScope.launch(Dispatchers.IO) {
+        if(firstName.isNotEmpty() && lastName.isNotEmpty() && rollNo.isNotEmpty())
+        {
+            val student = Student(null, firstName, lastName, rollNo.toInt() )
 
+            GlobalScope.launch(Dispatchers.IO) {
                 appDb.studentDao().insert(student)
             }
 
@@ -60,7 +66,9 @@ class MainActivity : AppCompatActivity() {
             binding.etRollNo.text.clear()
 
             Toast.makeText(this@MainActivity,"Successfully written",Toast.LENGTH_SHORT).show()
-        }else Toast.makeText(this@MainActivity,"PLease Enter Data",Toast.LENGTH_SHORT).show()
+        }
+        else
+            Toast.makeText(this@MainActivity,"Please Enter Data",Toast.LENGTH_SHORT).show()
 
     }
 
@@ -75,12 +83,14 @@ class MainActivity : AppCompatActivity() {
             GlobalScope.launch {
 
                 student = appDb.studentDao().findByRoll(rollNo.toInt())
-                Log.d("Robin Data",student.toString())
+                Log.d("Robin Data", student.toString())
                 displayData(student)
 
             }
 
-        }else Toast.makeText(this@MainActivity,"Please enter the data", Toast.LENGTH_SHORT).show()
+        }
+        else
+            Toast.makeText(this@MainActivity,"Please enter the data", Toast.LENGTH_SHORT).show()
 
     }
 
@@ -93,6 +103,32 @@ class MainActivity : AppCompatActivity() {
             binding.tvRollNo.text = student.rollNo.toString()
 
         }
+
+    }
+
+    private fun updateData(){
+        // get all the 3 values entered by the user
+        // similar to the writeData method with few changes
+
+        val firstName = binding.etFirstName.text.toString()
+        val lastName = binding.etLastName.text.toString()
+        val rollNo = binding.etRollNo.text.toString()
+
+        if(firstName.isNotEmpty() && lastName.isNotEmpty() && rollNo.isNotEmpty())
+        {
+
+            GlobalScope.launch(Dispatchers.IO) {
+                appDb.studentDao().update(firstName,lastName, rollNo.toInt())
+            }
+
+            binding.etFirstName.text.clear()
+            binding.etLastName.text.clear()
+            binding.etRollNo.text.clear()
+
+            Toast.makeText(this@MainActivity,"Successfully Updated",Toast.LENGTH_SHORT).show()
+        }
+        else
+            Toast.makeText(this@MainActivity,"Please Enter Data",Toast.LENGTH_SHORT).show()
 
     }
 

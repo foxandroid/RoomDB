@@ -14,14 +14,23 @@ abstract class AppDatabase : RoomDatabase() {
     companion object{
 
         @Volatile
-        private var INSTANCE : AppDatabase? = null
+        private var INSTANCE : AppDatabase? = null   //create a reference variable to the appDatabase class
 
+        /* Whenever user calls the below method a new database will be created. If its already called
+           then only single instance will be created at any given point of time in the whole application.
+         */
         fun getDatabase(context: Context): AppDatabase{
 
-            val tempInstance = INSTANCE
-            if(tempInstance != null){
-                return tempInstance
+            val currentInstance = INSTANCE
+            if(currentInstance != null){
+                return currentInstance
             }
+
+            /* First time Appdatabase is created and we don't have the current instance of that, so
+               create a data instance of that database.
+               Synchronized means if there are 3 operations then all of them would be performed one after
+               the other not at single point of time.*/
+
             synchronized(this){
                 val instance = Room.databaseBuilder(
                     context.applicationContext,
