@@ -10,7 +10,7 @@ interface StudentDao {
     fun getAll(): List<Student>
 
     // If there are 5 students with the rollno as 101 the below query would fetch us only one of them.
-    @Query("SELECT * FROM student_table WHERE roll_no LIKE :roll LIMIT 1")
+    @Query("SELECT * FROM student_table WHERE roll_no =:roll LIMIT 1")
     suspend fun findByRoll(roll: Int): Student
 
     // If your table have duplicate items, use below query to avoid it
